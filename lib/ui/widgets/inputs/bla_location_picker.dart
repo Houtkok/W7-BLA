@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:week_3_blabla_project/model/location/locations.dart';
 
-import '../../../service/locations_service.dart';
 import '../../theme/theme.dart';
 
 ///
@@ -30,7 +29,6 @@ class _BlaLocationPickerState extends State<BlaLocationPicker> {
 
     if (widget.initLocation != null) {
       String city = widget.initLocation!.name;
-      filteredLocations = LocationsService.instance.getLocationsFor(city);
     }
   }
 
@@ -47,7 +45,6 @@ class _BlaLocationPickerState extends State<BlaLocationPicker> {
 
     if (searchText.length > 1) {
       // We start to search from 2 characters only.
-      newSelection = LocationsService.instance.getLocationsFor(searchText);
     }
 
     setState(() {

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:week_3_blabla_project/ui/providers/ride_pref_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../../../model/ride/ride_pref.dart';
-import '../../../service/ride_prefs_service.dart';
 import '../../theme/theme.dart';
 
 import '../../../utils/animations_util.dart';
@@ -24,24 +25,25 @@ class RidePrefScreen extends StatefulWidget {
 }
 
 class _RidePrefScreenState extends State<RidePrefScreen> {
-  onRidePrefSelected(RidePreference newPreference) async {
-    // 1 - Update the current preference
-    RidePrefService.instance.setCurrentPreference(newPreference);
-
-    // 2 - Navigate to the rides screen (with a buttom to top animation)
-    await Navigator.of(context)
-        .push(AnimationUtils.createBottomToTopRoute(RidesScreen()));
-
-    // 3 - After wait  - Update the state   -- TODO MAKE IT WITH STATE MANAGEMENT
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
-    RidePreference? currentRidePreference =
-        RidePrefService.instance.currentPreference;
-    List<RidePreference> pastPreferences =
-        RidePrefService.instance.getPastPreferences();
+    // watch the RidePrefProvider
+    final ridePrefProvider =
+        Provider.of<RidePrefProvider>(context, listen: false);
+    RidePreference? currentRidePreference = ridePrefProvider.currentPreference;
+    List<RidePreference> pastPreferences = ridePrefProvider.preferencesHistory;
+
+    onRidePrefSelected(RidePreference newPreference) async {
+      //read the ridePrefProvider
+      final ridePrefProvider =
+          Provider.of<RidePrefProvider>(context, listen: false);
+
+      //call the provider setCurrentPreference
+      ridePrefProvider.setCurrentPreference(newPreference);
+
+      await Navigator.of(context)
+          .push(AnimationUtils.createBottomToTopRoute(const RidesScreen()));
+    }
 
     return Stack(
       children: [
