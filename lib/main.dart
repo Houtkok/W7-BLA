@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:week_3_blabla_project/ui/providers/ride_pref_provider.dart';
 
-import 'repository/mock/mock_ride_preferences_repository.dart';
+import 'data/repository/mock/mock_ride_preferences_repository.dart';
 import 'ui/screens/ride_pref/ride_pref_screen.dart';
 import 'ui/theme/theme.dart';
 
