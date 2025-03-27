@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:week_3_blabla_project/data/repository/local/local_ride_preferences_repository.dart';
 import 'package:week_3_blabla_project/ui/providers/ride_pref_provider.dart';
 
-import 'data/repository/mock/mock_ride_preferences_repository.dart';
 import 'ui/screens/ride_pref/ride_pref_screen.dart';
 import 'ui/theme/theme.dart';
 
@@ -13,6 +14,8 @@ void main() {
   // RidesService.initialize(MockRidesRepository());
 
   // 2- Run the UI
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences.getInstance();
   runApp(const MyApp());
 }
 
@@ -24,7 +27,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => RidePrefProvider(MockRidePreferencesRepository()),
+          create: (context) => RidePrefProvider(LocalRidePreferencesRepository()),
         ),
       ],
       child: MaterialApp(

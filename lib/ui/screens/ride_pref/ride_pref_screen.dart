@@ -19,14 +19,9 @@ const String blablaHomeImagePath = 'assets/images/blabla_home.png';
 /// - Enter his/her ride preference and launch a search on it
 /// - Or select a last entered ride preferences and launch a search on it
 ///
-class RidePrefScreen extends StatefulWidget {
+class RidePrefScreen extends StatelessWidget {
   const RidePrefScreen({super.key});
 
-  @override
-  State<RidePrefScreen> createState() => _RidePrefScreenState();
-}
-
-class _RidePrefScreenState extends State<RidePrefScreen> {
   @override
   Widget build(BuildContext context) {
     // watch the RidePrefProvider
@@ -62,42 +57,49 @@ class _RidePrefScreenState extends State<RidePrefScreen> {
               style: BlaTextStyles.heading.copyWith(color: Colors.white),
             ),
             SizedBox(height: 100),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: BlaSpacings.xxl),
-              decoration: BoxDecoration(
-                color: Colors.white, // White background
-                borderRadius: BorderRadius.circular(16), // Rounded corners
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // 2.1 Display the Form to input the ride preferences
-                  RidePrefForm(
-                      initialPreference: currentRidePreference,
-                      onSubmit: onRidePrefSelected),
-                  SizedBox(height: BlaSpacings.m),
-
-                  // 2.2 Optionally display a list of past preferences
-                  if (pastPreferences.isLoading)
-                    const BlaError(message: 'Loading...')
-                  else if (pastPreferences.error != null)
-                    const BlaError(message: 'No connection...')
-                  else if (pastPreferences.data != null)
-                    SizedBox(
-                      height: 200, // Set a fixed height
-                      child: ListView.builder(
-                        shrinkWrap: true, // Fix ListView height issue
-                        physics: AlwaysScrollableScrollPhysics(),
-                        itemCount: pastPreferences.data!.length,
-                        itemBuilder: (ctx, index) => RidePrefHistoryTile(
-                          ridePref: pastPreferences.data![index],
-                          onPressed: () =>
-                              onRidePrefSelected(pastPreferences.data![index]),
-                        ),
-                      ),
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: BlaSpacings.xxl),
+                decoration: BoxDecoration(
+                  color: Colors.white, // White background
+                  borderRadius: BorderRadius.circular(16), // Rounded corners
+                ),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.all(BlaSpacings.m),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // 2.1 Display the Form to input the ride preferences
+                        RidePrefForm(
+                            initialPreference: currentRidePreference,
+                            onSubmit: onRidePrefSelected),
+                        SizedBox(height: BlaSpacings.m),
+                                  
+                        // 2.2 Optionally display a list of past preferences
+                        if (pastPreferences.isLoading)
+                          const BlaError(message: 'Loading...')
+                        else if (pastPreferences.error != null)
+                          const BlaError(message: 'No connection...')
+                        else if (pastPreferences.data != null)
+                          ConstrainedBox(
+                            constraints: BoxConstraints(maxHeight: 200),
+                            child: ListView.builder(
+                              shrinkWrap: true, // Fix ListView height issue
+                              physics: AlwaysScrollableScrollPhysics(),
+                              itemCount: pastPreferences.data!.length,
+                              itemBuilder: (ctx, index) => RidePrefHistoryTile(
+                                ridePref: pastPreferences.data![index],
+                                onPressed: () =>
+                                    onRidePrefSelected(pastPreferences.data![index]),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                ],
+                  ),
+                ),
               ),
             ),
           ],
