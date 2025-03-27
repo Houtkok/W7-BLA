@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:week_3_blabla_project/ui/providers/asyn_value.dart';
 import 'package:week_3_blabla_project/ui/providers/ride_pref_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:week_3_blabla_project/ui/widgets/errors/bla_error_screen.dart';
 
 import '../../../model/ride/ride_pref.dart';
 import '../../theme/theme.dart';
@@ -31,7 +33,8 @@ class _RidePrefScreenState extends State<RidePrefScreen> {
     final ridePrefProvider =
         Provider.of<RidePrefProvider>(context, listen: false);
     RidePreference? currentRidePreference = ridePrefProvider.currentPreference;
-    List<RidePreference> pastPreferences = ridePrefProvider.preferencesHistory;
+    AsyncValue<List<RidePreference>> pastPreferences =
+        ridePrefProvider.preferencesHistory;
 
     onRidePrefSelected(RidePreference newPreference) async {
       //read the ridePrefProvider
@@ -76,19 +79,24 @@ class _RidePrefScreenState extends State<RidePrefScreen> {
                   SizedBox(height: BlaSpacings.m),
 
                   // 2.2 Optionally display a list of past preferences
-                  SizedBox(
-                    height: 200, // Set a fixed height
-                    child: ListView.builder(
-                      shrinkWrap: true, // Fix ListView height issue
-                      physics: AlwaysScrollableScrollPhysics(),
-                      itemCount: pastPreferences.length,
-                      itemBuilder: (ctx, index) => RidePrefHistoryTile(
-                        ridePref: pastPreferences[index],
-                        onPressed: () =>
-                            onRidePrefSelected(pastPreferences[index]),
+                  if (pastPreferences.isLoading)
+                    const BlaError(message: 'Loading...')
+                  else if (pastPreferences.error != null)
+                    const BlaError(message: 'No connection...')
+                  else if (pastPreferences.data != null)
+                    SizedBox(
+                      height: 200, // Set a fixed height
+                      child: ListView.builder(
+                        shrinkWrap: true, // Fix ListView height issue
+                        physics: AlwaysScrollableScrollPhysics(),
+                        itemCount: pastPreferences.data!.length,
+                        itemBuilder: (ctx, index) => RidePrefHistoryTile(
+                          ridePref: pastPreferences.data![index],
+                          onPressed: () =>
+                              onRidePrefSelected(pastPreferences.data![index]),
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),

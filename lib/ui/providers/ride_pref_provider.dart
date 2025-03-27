@@ -1,32 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:week_3_blabla_project/model/ride/ride_pref.dart';
 import 'package:week_3_blabla_project/repository/ride_preferences_repository.dart';
+import 'package:week_3_blabla_project/ui/providers/asyn_value.dart';
 
 class RidePrefProvider extends ChangeNotifier {
   RidePrefProvider(this._repository) {
     _currentPreference = null;
-    _pastPreferences = _repository.getPastPreferences();
+    fetchPastPreferences();
   }
 
   final RidePreferencesRepository _repository;
   RidePreference? _currentPreference;
-  List<RidePreference> _pastPreferences = [];
+  AsyncValue<List<RidePreference>> _pastPreferences = AsyncValue.loading();
 
   RidePreference? get currentPreference => _currentPreference;
-  // the past preferences from the newest to the latest
-  List<RidePreference> get preferencesHistory =>
-      _pastPreferences.reversed.toList();
 
-  void setCurrentPreference(RidePreference newPreference) {
+  AsyncValue<List<RidePreference>> get preferencesHistory => _pastPreferences;
+
+  Future<void> setCurrentPreference(RidePreference newPreference)async {
     //if the new preference is not equal to the current one
     if (_currentPreference != newPreference) {
       _currentPreference = newPreference;
-      //history shall not be duplicate
-      if (!_pastPreferences.contains(newPreference)) {
-        _pastPreferences.insert(0, newPreference);
-        _repository.addPreference(newPreference);
-      }
+      
+      await _repository.addPreference(newPreference);
+      fetchPastPreferences();
       notifyListeners();
     }
+  }
+  
+  Future<void> fetchPastPreferences() async {
+    _pastPreferences = AsyncValue.loading();
+    notifyListeners();
+
+    try{
+      List<RidePreference> pastPrefs = await _repository.getPastPreferences();
+      _pastPreferences = AsyncValue.success(pastPrefs);
+    }
+    catch(e){
+      _pastPreferences = AsyncValue.errorValue(e);
+    }
+    notifyListeners();
   }
 }
